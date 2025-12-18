@@ -1,5 +1,4 @@
 import { FileText, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { JournalArticle } from "@/data/journalArticles";
 
 interface JournalArticleCardProps {
@@ -9,14 +8,14 @@ interface JournalArticleCardProps {
 
 const JournalArticleCard = ({ article, showAbstract = false }: JournalArticleCardProps) => {
   return (
-    <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+    <article className="border border-border rounded-xl p-6 bg-card transition-all duration-300 hover:shadow-lg hover:border-accent/30 hover:scale-[1.01] group">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <FileText className="w-5 h-5 text-primary" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center transition-all duration-300 group-hover:bg-accent/20 group-hover:scale-110">
+          <FileText className="w-5 h-5 text-accent" />
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold leading-tight mb-2 text-foreground">
+          <h3 className="text-lg font-semibold leading-tight mb-2 text-foreground transition-colors duration-300 group-hover:text-accent">
             {article.title}
           </h3>
           
@@ -40,7 +39,7 @@ const JournalArticleCard = ({ article, showAbstract = false }: JournalArticleCar
               {article.keywords.slice(0, 4).map((keyword, index) => (
                 <span
                   key={index}
-                  className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground"
+                  className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground transition-all duration-300 hover:bg-accent/20 hover:text-accent cursor-default"
                 >
                   {keyword}
                 </span>
@@ -48,20 +47,18 @@ const JournalArticleCard = ({ article, showAbstract = false }: JournalArticleCar
             </div>
           )}
           
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            asChild
+          <a
+            href={article.pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent text-accent-foreground transition-all duration-300 hover:scale-105 hover:shadow-md"
           >
-            <a href={article.pdfUrl} target="_blank" rel="noopener noreferrer">
-              <Download className="w-4 h-4" />
-              Download PDF
-            </a>
-          </Button>
+            <Download className="w-4 h-4" />
+            Download PDF
+          </a>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
