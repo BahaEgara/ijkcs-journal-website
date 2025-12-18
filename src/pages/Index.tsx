@@ -26,7 +26,7 @@ const Index = () => {
             <div className="relative order-2 lg:order-1">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center group">
                 <img
-                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=600&fit=crop"
+                  src="src/assets/readingperson.jpg"
                   alt="African cultural heritage and knowledge"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
