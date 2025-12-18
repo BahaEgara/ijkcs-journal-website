@@ -1,100 +1,165 @@
 import Header from "@/components/Header";
-import ArticleCard from "@/components/ArticleCard";
-import HeroSection from "@/components/HeroSection";
-import IntroSection from "@/components/IntroSection";
-import { articles } from "@/data/articles";
+import JournalArticleCard from "@/components/JournalArticleCard";
+import { currentIssue } from "@/data/journalArticles";
+import { BookOpen, Users, Globe, Award } from "lucide-react";
 
 const Index = () => {
-  const featuredArticles = articles.slice(0, 6);
+  const focusAreas = [
+    "Cultural values, practices, and traditions",
+    "Language, literature, and oral heritage",
+    "Indigenous technologies and innovations",
+    "Governance, law, and traditional conflict resolution",
+    "Environmental stewardship and agroecology",
+    "Health, healing knowledge, and spirituality",
+    "Heritage preservation and knowledge transmission",
+  ];
 
   return (
-    <div className="min-h-screen bg-background animate-fade-in">
+    <div className="min-h-screen bg-background">
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
-        <HeroSection />
-
-        {/* Intro Section */}
-        <IntroSection />
-
-        {/* Featured Articles Grid */}
-        <section id="articles" className="py-12">
-          <div className="flex items-center justify-between mb-12 animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Featured Articles</h2>
-            <a href="#all" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors px-4 py-2 rounded-full hover:bg-muted/60">
-              View all →
-            </a>
+        <section className="py-12 md:py-16 animate-fade-in">
+          <div className="max-w-4xl">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight mb-6">
+              International Journal of Indigenous Knowledge and Cultural Studies
+            </h1>
+            <p className="text-lg text-muted-foreground mb-4">
+              <span className="font-semibold text-foreground">IJKCS</span> is a peer-reviewed scholarly journal published by the{" "}
+              <span className="font-semibold">African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC)</span>.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              The journal is dedicated to documenting, analyzing, and promoting African Indigenous Knowledge Systems.
+            </p>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredArticles.map((article, index) => (
-              <div key={article.id} className={`animate-slide-up stagger-${Math.min(index + 1, 6)}`}>
-                <ArticleCard {...article} size="small" />
+        {/* Focus Areas */}
+        <section className="py-8 md:py-12 border-t border-border">
+          <h2 className="text-xl font-semibold mb-6">Areas of Focus</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {focusAreas.map((area, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+              >
+                <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
+                <span className="text-sm">{area}</span>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Newsletter Section */}
-        <section className="my-20 rounded-[2.5rem] bg-card p-12 md:p-16 text-center animate-scale-in">
-          <div className="max-w-2xl mx-auto space-y-8">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Stay inspired.</h2>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Subscribe to receive our latest articles and insights directly in your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-6 py-4 rounded-full border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-              />
-              <button className="px-10 py-4 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 hover:scale-105 transition-all">
-                Subscribe
-              </button>
+        {/* Announcement */}
+        <section className="py-8 md:py-12">
+          <div className="rounded-xl bg-accent/10 border border-accent/20 p-6 md:p-8">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                <Award className="w-6 h-6 text-accent" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Announcement</h2>
+                <p className="text-foreground">
+                  The First Issue of IJKCS will be officially launched on <strong>27th February 2026</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Current Issue */}
+        <section className="py-8 md:py-12 border-t border-border">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Current Issue</h2>
+              <p className="text-muted-foreground">
+                Volume {currentIssue.volume} ({currentIssue.year}) • Published: {currentIssue.publishedDate}
+              </p>
+            </div>
+            <a
+              href="/archives"
+              className="text-sm font-medium text-accent hover:underline hidden sm:block"
+            >
+              View all archives →
+            </a>
+          </div>
+
+          <div className="space-y-4">
+            {currentIssue.articles.map((article) => (
+              <JournalArticleCard key={article.id} article={article} showAbstract />
+            ))}
+          </div>
+        </section>
+
+        {/* Journal Highlights */}
+        <section className="py-12 md:py-16 border-t border-border">
+          <h2 className="text-2xl font-bold mb-8 text-center">Journal Highlights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-6 rounded-xl bg-card">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-semibold mb-2">Peer-Reviewed</h3>
+              <p className="text-sm text-muted-foreground">
+                Double-blind peer review process ensuring academic rigor and quality
+              </p>
+            </div>
+            <div className="text-center p-6 rounded-xl bg-card">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-semibold mb-2">Open Access</h3>
+              <p className="text-sm text-muted-foreground">
+                Free access to all articles promoting global knowledge sharing
+              </p>
+            </div>
+            <div className="text-center p-6 rounded-xl bg-card">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-semibold mb-2">International Editorial Board</h3>
+              <p className="text-sm text-muted-foreground">
+                Scholars from across Africa and the global diaspora
+              </p>
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-16">
+      <footer className="border-t border-border mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4">Explore</h3>
+              <h3 className="font-semibold mb-4">About IJKCS</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                International Journal of Indigenous Knowledge and Cultural Studies (IJKCS) is published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC).
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/wellness" className="hover:text-accent transition-colors">Wellness</a></li>
-                <li><a href="/travel" className="hover:text-accent transition-colors">Travel</a></li>
-                <li><a href="/creativity" className="hover:text-accent transition-colors">Creativity</a></li>
-                <li><a href="/growth" className="hover:text-accent transition-colors">Growth</a></li>
+                <li><a href="/" className="hover:text-foreground transition-colors">Home</a></li>
+                <li><a href="/archives" className="hover:text-foreground transition-colors">Archives</a></li>
+                <li><a href="/about" className="hover:text-foreground transition-colors">About the Journal</a></li>
+                <li><a href="/contact" className="hover:text-foreground transition-colors">Contact</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">About</h3>
+              <h3 className="font-semibold mb-4">Contact</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/about" className="hover:text-accent transition-colors">Our Story</a></li>
-                <li><a href="/authors" className="hover:text-accent transition-colors">Authors</a></li>
-                <li><a href="/contact" className="hover:text-accent transition-colors">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/style-guide" className="hover:text-accent transition-colors">Style Guide</a></li>
-                <li><a href="/#newsletter" className="hover:text-accent transition-colors">Newsletter</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/privacy" className="hover:text-accent transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-accent transition-colors">Terms of Service</a></li>
+                <li>P.O. Box 72-00618, Nairobi, Kenya</li>
+                <li>
+                  <a href="mailto:info.ijikcs@gmail.com" className="hover:text-foreground transition-colors">
+                    info.ijikcs@gmail.com
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            <p>© 2025 Perspective. All rights reserved.</p>
+            <p>© 2025 International Journal of Indigenous Knowledge and Cultural Studies (IJKCS). All rights reserved.</p>
           </div>
         </div>
       </footer>
