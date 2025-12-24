@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      journal_articles: {
+        Row: {
+          abstract: string
+          authors: string[]
+          created_at: string
+          doi: string | null
+          id: string
+          issue: number | null
+          keywords: string[]
+          pages: string
+          pdf_url: string | null
+          published_date: string
+          title: string
+          topic: string | null
+          updated_at: string
+          volume: number
+          year: number
+        }
+        Insert: {
+          abstract: string
+          authors: string[]
+          created_at?: string
+          doi?: string | null
+          id?: string
+          issue?: number | null
+          keywords: string[]
+          pages: string
+          pdf_url?: string | null
+          published_date: string
+          title: string
+          topic?: string | null
+          updated_at?: string
+          volume: number
+          year: number
+        }
+        Update: {
+          abstract?: string
+          authors?: string[]
+          created_at?: string
+          doi?: string | null
+          id?: string
+          issue?: number | null
+          keywords?: string[]
+          pages?: string
+          pdf_url?: string | null
+          published_date?: string
+          title?: string
+          topic?: string | null
+          updated_at?: string
+          volume?: number
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
