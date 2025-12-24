@@ -1,5 +1,6 @@
-import { FileText, Download } from "lucide-react";
-import { JournalArticle } from "@/data/journalArticles";
+import { Link } from "react-router-dom";
+import { FileText, ExternalLink } from "lucide-react";
+import { JournalArticle } from "@/hooks/useJournalArticles";
 
 interface JournalArticleCardProps {
   article: JournalArticle;
@@ -26,6 +27,11 @@ const JournalArticleCard = ({ article, showAbstract = false }: JournalArticleCar
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mb-3">
             <span>Vol. {article.volume} ({article.year})</span>
             <span>pp. {article.pages}</span>
+            {article.topic && (
+              <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                {article.topic}
+              </span>
+            )}
           </div>
           
           {showAbstract && (
@@ -47,15 +53,13 @@ const JournalArticleCard = ({ article, showAbstract = false }: JournalArticleCar
             </div>
           )}
           
-          <a
-            href={article.pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to={`/article/${article.id}`}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent text-accent-foreground transition-all duration-300 hover:scale-105 hover:shadow-md"
           >
-            <Download className="w-4 h-4" />
-            Download PDF
-          </a>
+            <ExternalLink className="w-4 h-4" />
+            View & Download PDF
+          </Link>
         </div>
       </div>
     </article>

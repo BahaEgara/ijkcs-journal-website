@@ -1,9 +1,14 @@
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import JournalArticleCard from "@/components/JournalArticleCard";
-import { currentIssue } from "@/data/journalArticles";
+import { useJournalArticles } from "@/hooks/useJournalArticles";
 import { BookOpen, Users, Globe, Award } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import readingPerson from "@/assets/readingperson.jpg";
 
 const Index = () => {
+  const { data: articles, isLoading } = useJournalArticles({ volume: 1 });
+
   const focusAreas = [
     "Cultural values, practices, and traditions",
     "Language, literature, and oral heritage",
@@ -13,6 +18,11 @@ const Index = () => {
     "Health, healing knowledge, and spirituality",
     "Heritage preservation and knowledge transmission",
   ];
+
+  // Get current issue info from articles
+  const currentVolume = articles?.[0]?.volume || 1;
+  const currentYear = articles?.[0]?.year || 2026;
+  const publishedDate = articles?.[0]?.published_date || "February 2026";
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,7 +36,7 @@ const Index = () => {
             <div className="relative order-2 lg:order-1">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center group">
                 <img
-                  src="src/assets/readingperson.jpg"
+                  src={readingPerson}
                   alt="African cultural heritage and knowledge"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -90,22 +100,34 @@ const Index = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Current Issue</h2>
               <p className="text-muted-foreground">
-                Volume {currentIssue.volume} ({currentIssue.year}) • Published: {currentIssue.publishedDate}
+                Volume {currentVolume} ({currentYear}) • Published: {publishedDate}
               </p>
             </div>
-            <a
-              href="/archives"
+            <Link
+              to="/archives"
               className="text-sm font-medium text-accent hover:underline hidden sm:block transition-colors duration-300 hover:text-accent/80"
             >
               View all archives →
-            </a>
+            </Link>
           </div>
 
-          <div className="space-y-4">
-            {currentIssue.articles.map((article) => (
-              <JournalArticleCard key={article.id} article={article} showAbstract />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border border-border rounded-xl p-6">
+                  <Skeleton className="h-6 w-3/4 mb-3" />
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-4 w-1/4" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {articles?.map((article) => (
+                <JournalArticleCard key={article.id} article={article} showAbstract />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Journal Insights */}
@@ -156,10 +178,10 @@ const Index = () => {
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/" className="hover:text-accent transition-colors duration-300">Home</a></li>
-                <li><a href="/archives" className="hover:text-accent transition-colors duration-300">Archives</a></li>
-                <li><a href="/about" className="hover:text-accent transition-colors duration-300">About the Journal</a></li>
-                <li><a href="/contact" className="hover:text-accent transition-colors duration-300">Contact</a></li>
+                <li><Link to="/" className="hover:text-accent transition-colors duration-300">Home</Link></li>
+                <li><Link to="/archives" className="hover:text-accent transition-colors duration-300">Archives</Link></li>
+                <li><Link to="/about" className="hover:text-accent transition-colors duration-300">About the Journal</Link></li>
+                <li><Link to="/contact" className="hover:text-accent transition-colors duration-300">Contact</Link></li>
               </ul>
             </div>
             <div>
