@@ -9,6 +9,9 @@ import Archives from "./pages/Archives";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ArticleView from "./pages/ArticleView";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
