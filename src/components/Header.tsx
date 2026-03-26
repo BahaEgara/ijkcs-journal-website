@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
