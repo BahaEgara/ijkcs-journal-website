@@ -47,6 +47,7 @@ const Header = () => {
     { href: "/archives", label: "Archives" },
     { href: "/about", label: "About the Journal" },
     { href: "/contact", label: "Contact" },
+    ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
   return (
