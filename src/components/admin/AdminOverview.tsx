@@ -1,24 +1,51 @@
-import { FileText, Upload, Users, Eye, TrendingUp, BookOpen } from "lucide-react";
+import { useState } from "react";
+import { FileText, Upload, Users, Eye, BookOpen, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const stats = [
-  { label: "Total Articles", value: "24", icon: FileText, trend: "+3 this month" },
-  { label: "PDFs Uploaded", value: "18", icon: Upload, trend: "75% coverage" },
-  { label: "Total Views", value: "1,247", icon: Eye, trend: "+12% this week" },
-  { label: "Active Volumes", value: "3", icon: BookOpen, trend: "Vol. 3 current" },
-  { label: "Registered Users", value: "156", icon: Users, trend: "+8 new" },
-  { label: "Downloads", value: "892", icon: TrendingUp, trend: "+5% this month" },
-];
-
-const recentActivity = [
-  { action: "Article created", detail: "Indigenous Water Management in Kenya", time: "2 hours ago" },
-  { action: "PDF uploaded", detail: "Vol. 3, Issue 1 - Full Text", time: "5 hours ago" },
-  { action: "Article updated", detail: "Oral Traditions and Digital Archives", time: "1 day ago" },
-  { action: "New user registered", detail: "researcher@university.ac.ke", time: "2 days ago" },
-  { action: "Article deleted", detail: "Draft: Untitled Research", time: "3 days ago" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminOverview = () => {
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase.functions.invoke("admin-stats", {
+        method: "GET",
+      });
+      if (error) throw error;
+      return data as {
+        totalArticles: number;
+        totalUsers: number;
+        activeVolumes: number;
+        pdfsUploaded: number;
+      };
+    },
+  });
+
+  const { data: recentArticles, isLoading: articlesLoading } = useQuery({
+    queryKey: ["admin-recent-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("journal_articles")
+        .select("id, title, created_at, updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const statCards = [
+    { label: "Total Articles", value: stats?.totalArticles ?? "—", icon: FileText, trend: "" },
+    { label: "PDFs Uploaded", value: stats?.pdfsUploaded ?? "—", icon: Upload, trend: stats ? `${Math.round(((stats.pdfsUploaded) / Math.max(stats.totalArticles, 1)) * 100)}% coverage` : "" },
+    { label: "Active Volumes", value: stats?.activeVolumes ?? "—", icon: BookOpen, trend: "" },
+    { label: "Registered Users", value: stats?.totalUsers ?? "—", icon: Users, trend: "" },
+  ];
+
+  const isLoading = statsLoading || articlesLoading;
+
   return (
     <div className="space-y-8">
       <div>
@@ -26,16 +53,21 @@ const AdminOverview = () => {
         <p className="text-muted-foreground mt-1">Welcome back. Here's what's happening with IJIKCS.</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map((stat) => (
+      {isLoading && (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading dashboard data...
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((stat) => (
           <Card key={stat.label} className="hover:shadow-md transition-shadow duration-200 group">
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="text-3xl font-bold text-foreground mt-1">{stat.value}</p>
-                  <p className="text-xs text-accent mt-2">{stat.trend}</p>
+                  {stat.trend && <p className="text-xs text-accent mt-2">{stat.trend}</p>}
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                   <stat.icon className="h-6 w-6 text-accent" />
@@ -46,23 +78,26 @@ const AdminOverview = () => {
         ))}
       </div>
 
-      {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-lg">Recent Activity</CardTitle>
+          <CardTitle className="font-serif text-lg">Recently Updated Articles</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentActivity.map((item, i) => (
-              <div key={i} className="flex items-start gap-4 py-3 border-b border-border last:border-0">
+            {(recentArticles ?? []).map((article) => (
+              <div key={article.id} className="flex items-start gap-4 py-3 border-b border-border last:border-0">
                 <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{item.action}</p>
-                  <p className="text-sm text-muted-foreground truncate">{item.detail}</p>
+                  <p className="text-sm font-medium text-foreground">{article.title}</p>
                 </div>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{item.time}</span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {new Date(article.updated_at).toLocaleDateString()}
+                </span>
               </div>
             ))}
+            {!articlesLoading && (!recentArticles || recentArticles.length === 0) && (
+              <p className="text-sm text-muted-foreground">No articles yet.</p>
+            )}
           </div>
         </CardContent>
       </Card>

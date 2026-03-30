@@ -1,28 +1,64 @@
 import { useState } from "react";
-import { Search, Plus, Pencil, Trash2, FileText, Download, Filter } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, FileText, Download, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const sampleArticles = [
-  { id: "1", title: "Indigenous Water Management Systems in East Africa", authors: ["Dr. Amina Osei", "Prof. Kwame Mensah"], volume: 3, issue: 1, year: 2026, topic: "Environmental Stewardship", hasPdf: true, status: "Published" },
-  { id: "2", title: "Oral Traditions and Digital Archiving: A Framework", authors: ["Dr. Fatima Bello"], volume: 3, issue: 1, year: 2026, topic: "Heritage Preservation", hasPdf: true, status: "Published" },
-  { id: "3", title: "Traditional Conflict Resolution in West African Communities", authors: ["Prof. Chidi Nwosu", "Dr. Aisha Kamara"], volume: 2, issue: 2, year: 2025, topic: "Governance & Law", hasPdf: false, status: "Published" },
-  { id: "4", title: "Ethnobotanical Knowledge Among Maasai Pastoralists", authors: ["Dr. Lekishon Ole Nkini"], volume: 2, issue: 2, year: 2025, topic: "Health & Healing", hasPdf: true, status: "Published" },
-  { id: "5", title: "The Role of Indigenous Languages in Knowledge Transfer", authors: ["Prof. Ngũgĩ Wanjiku", "Dr. Amara Diallo"], volume: 2, issue: 1, year: 2025, topic: "Language & Literature", hasPdf: true, status: "Published" },
-  { id: "6", title: "Sustainable Agriculture Through Traditional Practices", authors: ["Dr. Blessing Moyo"], volume: 1, issue: 1, year: 2024, topic: "Agroecology", hasPdf: false, status: "Draft" },
-];
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminArticles = () => {
   const [search, setSearch] = useState("");
   const [filterVolume, setFilterVolume] = useState<string>("all");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const filtered = sampleArticles.filter((a) => {
-    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.authors.some((auth) => auth.toLowerCase().includes(search.toLowerCase()));
+  const { data: articles, isLoading } = useQuery({
+    queryKey: ["admin-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("journal_articles")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: volumes } = useQuery({
+    queryKey: ["admin-volumes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("journal_articles")
+        .select("volume");
+      if (error) throw error;
+      const unique = [...new Set((data ?? []).map((d) => d.volume))].sort((a, b) => b - a);
+      return unique;
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("journal_articles").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast({ title: "Article deleted" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error deleting article", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const filtered = (articles ?? []).filter((a) => {
+    const matchesSearch =
+      a.title.toLowerCase().includes(search.toLowerCase()) ||
+      a.authors.some((auth: string) => auth.toLowerCase().includes(search.toLowerCase()));
     const matchesVolume = filterVolume === "all" || a.volume.toString() === filterVolume;
     return matchesSearch && matchesVolume;
   });
@@ -32,14 +68,10 @@ const AdminArticles = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-serif font-bold text-foreground">Manage Articles</h1>
-          <p className="text-muted-foreground mt-1">{sampleArticles.length} articles in the database</p>
+          <p className="text-muted-foreground mt-1">{articles?.length ?? 0} articles in the database</p>
         </div>
-        <Button className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Plus className="h-4 w-4" /> New Article
-        </Button>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -59,76 +91,95 @@ const AdminArticles = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Volumes</SelectItem>
-                <SelectItem value="3">Volume 3</SelectItem>
-                <SelectItem value="2">Volume 2</SelectItem>
-                <SelectItem value="1">Volume 1</SelectItem>
+                {(volumes ?? []).map((v) => (
+                  <SelectItem key={v} value={v.toString()}>Volume {v}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Articles Table */}
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[300px]">Title</TableHead>
-                  <TableHead>Authors</TableHead>
-                  <TableHead>Volume</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>PDF</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((article) => (
-                  <TableRow key={article.id} className="group hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium">{article.title}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {article.authors.join(", ")}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      Vol. {article.volume}, Issue {article.issue} ({article.year})
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="text-xs">{article.topic}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {article.hasPdf ? (
-                        <span className="inline-flex items-center gap-1 text-accent text-xs font-medium">
-                          <FileText className="h-3 w-3" /> Uploaded
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">Missing</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={article.status === "Published" ? "default" : "outline"} className="text-xs">
-                        {article.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+          {isLoading ? (
+            <div className="flex items-center justify-center p-8 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading articles...
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[300px]">Title</TableHead>
+                    <TableHead>Authors</TableHead>
+                    <TableHead>Volume</TableHead>
+                    <TableHead>Topic</TableHead>
+                    <TableHead>PDF</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((article) => (
+                    <TableRow key={article.id} className="group hover:bg-muted/40 transition-colors">
+                      <TableCell className="font-medium">{article.title}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {article.authors.join(", ")}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        Vol. {article.volume}{article.issue ? `, Issue ${article.issue}` : ""} ({article.year})
+                      </TableCell>
+                      <TableCell>
+                        {article.topic && <Badge variant="secondary" className="text-xs">{article.topic}</Badge>}
+                      </TableCell>
+                      <TableCell>
+                        {article.pdf_url ? (
+                          <span className="inline-flex items-center gap-1 text-accent text-xs font-medium">
+                            <FileText className="h-3 w-3" /> Uploaded
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">Missing</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {article.pdf_url && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                              onClick={() => window.open(article.pdf_url!, "_blank")}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            onClick={() => {
+                              if (confirm("Delete this article?")) {
+                                deleteMutation.mutate(article.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filtered.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No articles found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

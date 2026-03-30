@@ -1,12 +1,87 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Save } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminSettings = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const [journalName, setJournalName] = useState("");
+  const [abbreviation, setAbbreviation] = useState("");
+  const [issnPrint, setIssnPrint] = useState("");
+  const [issnOnline, setIssnOnline] = useState("");
+  const [description, setDescription] = useState("");
+  const [openAccess, setOpenAccess] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [showDownloads, setShowDownloads] = useState(false);
+
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ["admin-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("admin-settings", {
+        method: "GET",
+      });
+      if (error) throw error;
+      return data as Record<string, string>;
+    },
+  });
+
+  useEffect(() => {
+    if (settings) {
+      setJournalName(settings.journal_name ?? "");
+      setAbbreviation(settings.abbreviation ?? "");
+      setIssnPrint(settings.issn_print ?? "");
+      setIssnOnline(settings.issn_online ?? "");
+      setDescription(settings.description ?? "");
+      setOpenAccess(settings.open_access === "true");
+      setEmailNotifications(settings.email_notifications === "true");
+      setShowDownloads(settings.show_downloads_count === "true");
+    }
+  }, [settings]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("admin-settings", {
+        method: "PUT",
+        body: {
+          journal_name: journalName,
+          abbreviation,
+          issn_print: issnPrint,
+          issn_online: issnOnline,
+          description,
+          open_access: openAccess.toString(),
+          email_notifications: emailNotifications.toString(),
+          show_downloads_count: showDownloads.toString(),
+        },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
+      toast({ title: "Settings saved successfully!" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error saving settings", description: error.message, variant: "destructive" });
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12 text-muted-foreground">
+        <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading settings...
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
@@ -14,7 +89,6 @@ const AdminSettings = () => {
         <p className="text-muted-foreground mt-1">Configure the journal's identity and preferences.</p>
       </div>
 
-      {/* General Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="font-serif text-lg">General Information</CardTitle>
@@ -23,30 +97,29 @@ const AdminSettings = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Journal Name</Label>
-            <Input defaultValue="International Journal of Indigenous Knowledge and Cultural Studies" />
+            <Input value={journalName} onChange={(e) => setJournalName(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>Abbreviation</Label>
-            <Input defaultValue="IJIKCS" />
+            <Input value={abbreviation} onChange={(e) => setAbbreviation(e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>ISSN (Print)</Label>
-              <Input defaultValue="XXXX-XXXX" />
+              <Input value={issnPrint} onChange={(e) => setIssnPrint(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>ISSN (Online)</Label>
-              <Input defaultValue="XXXX-XXXX" />
+              <Input value={issnOnline} onChange={(e) => setIssnOnline(e.target.value)} />
             </div>
           </div>
           <div className="space-y-2">
             <Label>Description</Label>
-            <Textarea rows={3} defaultValue="A peer-reviewed, open-access journal dedicated to the study, preservation, and dissemination of indigenous knowledge systems and cultural heritage across Africa and the Global South." />
+            <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
         </CardContent>
       </Card>
 
-      {/* Publishing Preferences */}
       <Card>
         <CardHeader>
           <CardTitle className="font-serif text-lg">Publishing Preferences</CardTitle>
@@ -57,28 +130,33 @@ const AdminSettings = () => {
               <p className="text-sm font-medium text-foreground">Open Access</p>
               <p className="text-xs text-muted-foreground">Allow free access to all published articles</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={openAccess} onCheckedChange={setOpenAccess} />
           </div>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-foreground">Email Notifications</p>
               <p className="text-xs text-muted-foreground">Send email alerts when new volumes are published</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
           </div>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-foreground">Show Article Downloads Count</p>
               <p className="text-xs text-muted-foreground">Display download statistics on article pages</p>
             </div>
-            <Switch />
+            <Switch checked={showDownloads} onCheckedChange={setShowDownloads} />
           </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
-        <Button className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Save className="h-4 w-4" /> Save Settings
+        <Button
+          className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
+          onClick={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending}
+        >
+          {saveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saveMutation.isPending ? "Saving..." : "Save Settings"}
         </Button>
       </div>
     </div>
