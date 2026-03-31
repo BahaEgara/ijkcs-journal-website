@@ -1,7 +1,3 @@
-
-import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminArticles from "@/components/admin/AdminArticles";
@@ -9,36 +5,16 @@ import AdminUpload from "@/components/admin/AdminUpload";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminSettings from "@/components/admin/AdminSettings";
 import PageLoader from "@/components/PageLoader";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
-
-const Admin = () => {
-  const { user, loading } = useAuth();
+const AdminDashboard = () => {
+  const { user, loading, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      setError("User not authenticated.");
-    } else {
-      setError(null);
-    }
-    // Debug logging
-    // eslint-disable-next-line no-console
-    console.log("[Admin Debug] user:", user, "loading:", loading, "error:", error);
-  }, [user, loading, error]);
 
   if (loading) return <PageLoader />;
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-destructive">
-        <div className="max-w-md p-6 rounded-lg border border-destructive bg-destructive/10">
-          <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-          <p className="mb-4">{error}</p>
-          <a href="/login" className="underline text-primary">Go to Login</a>
-        </div>
-      </div>
-    );
-  }
+  if (!user || !isAdmin) return <Navigate to="/login" replace />;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -61,4 +37,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default AdminDashboard;

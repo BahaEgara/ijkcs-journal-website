@@ -35,6 +35,7 @@ const Archives = () => {
   const { data: volumes = [] } = useAvailableVolumes();
 
   // Group articles by volume
+  // Ensure correct grouping and field usage
   const groupedArticles = articles?.reduce((acc, article) => {
     const key = `${article.volume}-${article.year}`;
     if (!acc[key]) {

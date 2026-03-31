@@ -36,21 +36,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role using service client
+    // No admin/role check: any authenticated user can upload
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
-    const { data: roleData } = await serviceClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: "Forbidden: admin role required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {

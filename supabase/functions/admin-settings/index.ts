@@ -12,62 +12,34 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: corsHeaders,
-      });
-    }
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: corsHeaders,
-      });
-    }
-
+    // GET: fetch settings (single row, id=1)
     if (req.method === "GET") {
-      // Public read - use anon client
       const { data, error } = await supabase
         .from("journal_settings")
-        .select("setting_key, setting_value");
-
-      if (error) throw error;
-
-      const settings: Record<string, string> = {};
-      (data ?? []).forEach((row: any) => {
-        settings[row.setting_key] = row.setting_value;
-      });
-
-      return new Response(JSON.stringify(settings), {
+        .select("*")
+        .eq("id", 1)
+        .single();
+      if (error && error.code !== "PGRST116") throw error;
+      return new Response(JSON.stringify(data || {}), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // PUT: upsert settings (single row, id=1)
     if (req.method === "PUT") {
-      // Admin-only update
-      const updates: Record<string, string> = await req.json();
-
-      // Use authenticated client (RLS enforces admin check)
-      for (const [key, value] of Object.entries(updates)) {
-        const { error } = await supabase
-          .from("journal_settings")
-          .update({ setting_value: value, updated_at: new Date().toISOString() })
-          .eq("setting_key", key);
-
-        if (error) throw error;
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
+      const body = await req.json();
+      const { data, error } = await supabase
+        .from("journal_settings")
+        .upsert([{ id: 1, ...body }], { onConflict: "id" })
+        .select()
+        .single();
+      if (error) throw error;
+      return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -77,9 +49,17 @@ Deno.serve(async (req) => {
       headers: corsHeaders,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: corsHeaders,
-    });
+    // Log the full error object for debugging
+    console.error("admin-settings error:", error);
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        details: error,
+      }),
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
+    );
   }
 });

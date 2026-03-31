@@ -56,10 +56,13 @@ const AdminArticles = () => {
   });
 
   const filtered = articles.filter((a: any) => {
+    // Defensive: ensure all fields exist and are strings/arrays
+    const title = a.title || "";
+    const authors = Array.isArray(a.authors) ? a.authors : [];
     const matchesSearch =
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.authors.some((auth: string) => auth.toLowerCase().includes(search.toLowerCase()));
-    const matchesVolume = filterVolume === "all" || a.volume.toString() === filterVolume;
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      authors.some((auth: string) => auth.toLowerCase().includes(search.toLowerCase()));
+    const matchesVolume = filterVolume === "all" || (a.volume && a.volume.toString() === filterVolume);
     return matchesSearch && matchesVolume;
   });
 
@@ -106,7 +109,7 @@ const AdminArticles = () => {
             <div className="flex items-center justify-center p-8 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading articles...
             </div>
-          ) : (
+          ) : ( 
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -124,13 +127,13 @@ const AdminArticles = () => {
                     <TableRow key={article.id} className="group hover:bg-muted/40 transition-colors">
                       <TableCell className="font-medium">{article.title}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {article.authors.join(", ")}
+                        {Array.isArray(article.authors) ? article.authors.join(", ") : ""}
                       </TableCell>
                       <TableCell className="text-sm">
                         Vol. {article.volume}{article.issue ? `, Issue ${article.issue}` : ""} ({article.year})
                       </TableCell>
                       <TableCell>
-                        {article.topic && <Badge variant="secondary" className="text-xs">{article.topic}</Badge>}
+                        {article.topic ? <Badge variant="secondary" className="text-xs">{article.topic}</Badge> : <span className="text-xs text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell>
                         {article.pdf_url ? (
@@ -148,7 +151,8 @@ const AdminArticles = () => {
                               size="sm"
                               variant="ghost"
                               className="h-8 w-8 p-0"
-                              onClick={() => window.open(article.pdf_url!, "_blank")}
+                              onClick={() => window.open(article.pdf_url, "_blank")}
+                              title="Download PDF"
                             >
                               <Download className="h-4 w-4" />
                             </Button>

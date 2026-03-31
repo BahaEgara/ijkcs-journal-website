@@ -42,82 +42,38 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify admin
-    const { data: roleData } = await serviceClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
 
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-        headers: corsHeaders,
-      });
-    }
+    // (Removed admin check: allow all authenticated users)
 
     const url = new URL(req.url);
 
     if (req.method === "GET") {
-      // Get all profiles with their roles
+      // Get all profiles, always return role: 'user'
       const { data: profiles, error: profilesError } = await serviceClient
         .from("profiles")
-        .select("*")
+        .select("id, full_name, email, created_at")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
 
-      const { data: roles, error: rolesError } = await serviceClient
-        .from("user_roles")
-        .select("*");
-
-      if (rolesError) throw rolesError;
-
-      const usersWithRoles = (profiles ?? []).map((p: any) => {
-        const userRole = (roles ?? []).find((r: any) => r.user_id === p.id);
-        return {
-          id: p.id,
-          full_name: p.full_name,
-          email: p.email,
-          role: userRole?.role ?? "user",
-          created_at: p.created_at,
-        };
-      });
+      const usersWithRoles = (profiles ?? []).map((p: any) => ({
+        id: p.id,
+        full_name: p.full_name,
+        email: p.email,
+        role: "user",
+        created_at: p.created_at,
+      }));
 
       return new Response(JSON.stringify(usersWithRoles), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // PUT method for roles is now disabled (no-op)
     if (req.method === "PUT") {
-      // Update user role
-      const { user_id, role } = await req.json();
-
-      if (!user_id || !role || !["admin", "moderator", "user"].includes(role)) {
-        return new Response(JSON.stringify({ error: "Invalid input" }), {
-          status: 400,
-          headers: corsHeaders,
-        });
-      }
-
-      // Delete existing role
-      await serviceClient
-        .from("user_roles")
-        .delete()
-        .eq("user_id", user_id);
-
-      // Insert new role if not default "user"
-      if (role !== "user") {
-        const { error } = await serviceClient
-          .from("user_roles")
-          .insert({ user_id, role });
-
-        if (error) throw error;
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: "Role management is disabled." }), {
+        status: 400,
+        headers: corsHeaders,
       });
     }
 
@@ -126,7 +82,20 @@ Deno.serve(async (req) => {
       headers: corsHeaders,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    // Enhanced error logging for debugging
+    let errorMessage = "Unknown error";
+    if (error instanceof Error) {
+      errorMessage = error.message + (error.stack ? `\nStack: ${error.stack}` : "");
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    } else {
+      try {
+        errorMessage = JSON.stringify(error);
+      } catch {}
+    }
+    // Optionally log to console for Supabase logs
+    console.error("admin-users function error:", errorMessage);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: corsHeaders,
     });

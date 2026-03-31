@@ -27,13 +27,16 @@ const AdminOverview = () => {
   const { data: recentArticles, isLoading: articlesLoading } = useQuery({
     queryKey: ["admin-recent-articles"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_articles")
-        .select("id, title, created_at, updated_at")
-        .order("updated_at", { ascending: false })
-        .limit(5);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase.functions.invoke("manage-articles", {
+        method: "GET",
+      });
       if (error) throw error;
-      return data;
+      // Sort by updated_at descending and take the first 5
+      const articles = (data?.articles ?? []).sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      return articles.slice(0, 5);
     },
   });
 

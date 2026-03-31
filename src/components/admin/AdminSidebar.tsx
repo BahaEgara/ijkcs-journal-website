@@ -1,5 +1,7 @@
+
 import { LayoutDashboard, FileText, Upload, Users, Settings, LogOut, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -14,7 +16,22 @@ const navItems = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
+import { useNavigate } from "react-router-dom";
+
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const displayName = user?.user_metadata?.full_name || user?.email || "User";
+  const displayEmail = user?.email || "";
+  const initials = (user?.user_metadata?.full_name
+    ? user.user_metadata.full_name.split(" ").map((n: string) => n[0]).join("")
+    : (user?.email ? user.email[0] : "U")).toUpperCase();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
   return (
     <aside className="w-64 min-h-screen bg-card border-r border-border flex flex-col">
       {/* Logo / Brand */}
@@ -53,14 +70,17 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
       <div className="p-4 border-t border-border space-y-2">
         <div className="flex items-center gap-3 px-4 py-2">
           <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-            <span className="text-xs font-bold text-accent">AD</span>
+            <span className="text-xs font-bold text-accent">{initials}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">Admin User</p>
-            <p className="text-xs text-muted-foreground truncate">admin@ijikcs.org</p>
+            <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
           </div>
         </div>
-        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+        <button
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          onClick={handleSignOut}
+        >
           <LogOut className="h-4 w-4" />
           Sign Out
         </button>

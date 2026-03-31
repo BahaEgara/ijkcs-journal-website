@@ -30,7 +30,7 @@ const AdminSettings = () => {
         method: "GET",
       });
       if (error) throw error;
-      return data as Record<string, string>;
+      return data as any;
     },
   });
 
@@ -41,9 +41,9 @@ const AdminSettings = () => {
       setIssnPrint(settings.issn_print ?? "");
       setIssnOnline(settings.issn_online ?? "");
       setDescription(settings.description ?? "");
-      setOpenAccess(settings.open_access === "true");
-      setEmailNotifications(settings.email_notifications === "true");
-      setShowDownloads(settings.show_downloads_count === "true");
+      setOpenAccess(Boolean(settings.open_access));
+      setEmailNotifications(Boolean(settings.email_notifications));
+      setShowDownloads(Boolean(settings.show_downloads_count));
     }
   }, [settings]);
 
@@ -57,9 +57,9 @@ const AdminSettings = () => {
           issn_print: issnPrint,
           issn_online: issnOnline,
           description,
-          open_access: openAccess.toString(),
-          email_notifications: emailNotifications.toString(),
-          show_downloads_count: showDownloads.toString(),
+          open_access: openAccess,
+          email_notifications: emailNotifications,
+          show_downloads_count: showDownloads,
         },
       });
       if (error) throw error;

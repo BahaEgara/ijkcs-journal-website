@@ -6,7 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function verifyAdmin(req: Request) {
+
+async function verifyAuth(req: Request) {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) throw new Error("UNAUTHORIZED");
 
@@ -21,15 +22,6 @@ async function verifyAdmin(req: Request) {
   if (error || !user) throw new Error("UNAUTHORIZED");
 
   const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: roleData } = await serviceClient
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("role", "admin")
-    .maybeSingle();
-
-  if (!roleData) throw new Error("FORBIDDEN");
-
   return { serviceClient, user };
 }
 
@@ -39,7 +31,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { serviceClient } = await verifyAdmin(req);
+    const { serviceClient } = await verifyAuth(req);
     const url = new URL(req.url);
 
     if (req.method === "GET") {

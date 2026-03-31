@@ -31,12 +31,9 @@ const ArticleView = () => {
       return;
     }
 
-    const pdfUrl = article.pdf_url.startsWith("http")
-      ? article.pdf_url
-      : `${SUPABASE_PUBLIC_BASE}/${article.pdf_url}`;
-
+    // Use the pdf_url directly (should be a public URL)
     const link = document.createElement("a");
-    link.href = pdfUrl;
+    link.href = article.pdf_url;
     link.setAttribute("download", "");
     link.target = "_blank";
 
