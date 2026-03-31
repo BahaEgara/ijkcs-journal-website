@@ -22,30 +22,62 @@ const AdminSettings = () => {
   const [openAccess, setOpenAccess] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [showDownloads, setShowDownloads] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["admin-settings"],
-    queryFn: async () => {
+
+  // Fetch settings by journal name
+  const fetchSettings = async (name: string) => {
+    setFetching(true);
+    try {
+      // Use query param for GET
       const { data, error } = await supabase.functions.invoke("admin-settings", {
         method: "GET",
+        // @ts-ignore
+        url: `admin-settings?journal_name=${encodeURIComponent(name)}`,
       });
       if (error) throw error;
-      return data as any;
-    },
-  });
-
-  useEffect(() => {
-    if (settings) {
-      setJournalName(settings.journal_name ?? "");
-      setAbbreviation(settings.abbreviation ?? "");
-      setIssnPrint(settings.issn_print ?? "");
-      setIssnOnline(settings.issn_online ?? "");
-      setDescription(settings.description ?? "");
-      setOpenAccess(Boolean(settings.open_access));
-      setEmailNotifications(Boolean(settings.email_notifications));
-      setShowDownloads(Boolean(settings.show_downloads_count));
+      if (data) {
+        setAbbreviation(data.abbreviation ?? "");
+        setIssnPrint(data.issn_print ?? "");
+        setIssnOnline(data.issn_online ?? "");
+        setDescription(data.description ?? "");
+        setOpenAccess(Boolean(data.open_access));
+        setEmailNotifications(Boolean(data.email_notifications));
+        setShowDownloads(Boolean(data.show_downloads_count));
+      } else {
+        setAbbreviation("");
+        setIssnPrint("");
+        setIssnOnline("");
+        setDescription("");
+        setOpenAccess(true);
+        setEmailNotifications(true);
+        setShowDownloads(false);
+      }
+    } catch (err) {
+      toast({ title: "Error fetching settings", description: (err as Error).message, variant: "destructive" });
+    } finally {
+      setFetching(false);
     }
-  }, [settings]);
+  };
+
+  // Fetch settings when journalName changes (debounced)
+  useEffect(() => {
+    if (journalName.trim()) {
+      const handler = setTimeout(() => {
+        fetchSettings(journalName.trim());
+      }, 400);
+      return () => clearTimeout(handler);
+    } else {
+      setAbbreviation("");
+      setIssnPrint("");
+      setIssnOnline("");
+      setDescription("");
+      setOpenAccess(true);
+      setEmailNotifications(true);
+      setShowDownloads(false);
+    }
+    // eslint-disable-next-line
+  }, [journalName]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -66,7 +98,6 @@ const AdminSettings = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       toast({ title: "Settings saved successfully!" });
     },
     onError: (error: Error) => {
@@ -74,7 +105,7 @@ const AdminSettings = () => {
     },
   });
 
-  if (isLoading) {
+  if (fetching) {
     return (
       <div className="flex items-center justify-center p-12 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading settings...
@@ -97,7 +128,7 @@ const AdminSettings = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Journal Name</Label>
-            <Input value={journalName} onChange={(e) => setJournalName(e.target.value)} />
+            <Input value={journalName} onChange={(e) => setJournalName(e.target.value)} placeholder="Type journal name..." />
           </div>
           <div className="space-y-2">
             <Label>Abbreviation</Label>

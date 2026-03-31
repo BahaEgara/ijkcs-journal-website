@@ -17,25 +17,35 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // GET: fetch settings (single row, id=1)
+    // GET: fetch settings (by journal_name or id=1)
     if (req.method === "GET") {
-      const { data, error } = await supabase
-        .from("journal_settings")
-        .select("*")
-        .eq("id", 1)
-        .single();
+      const url = new URL(req.url);
+      const journalName = url.searchParams.get("journal_name");
+      let query = supabase.from("journal_settings").select("*");
+      if (journalName) {
+        query = query.eq("journal_name", journalName).single();
+      } else {
+        query = query.eq("id", 1).single();
+      }
+      const { data, error } = await query;
       if (error && error.code !== "PGRST116") throw error;
       return new Response(JSON.stringify(data || {}), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // PUT: upsert settings (single row, id=1)
+    // PUT: upsert settings (by journal_name)
     if (req.method === "PUT") {
       const body = await req.json();
+      if (!body.journal_name) {
+        return new Response(JSON.stringify({ error: "journal_name is required" }), {
+          status: 400,
+          headers: corsHeaders,
+        });
+      }
       const { data, error } = await supabase
         .from("journal_settings")
-        .upsert([{ id: 1, ...body }], { onConflict: "id" })
+        .upsert([body], { onConflict: "journal_name" })
         .select()
         .single();
       if (error) throw error;
