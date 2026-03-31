@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
 
-## Project info
+# International Journal of Indigenous Knowledge and Cultural Studies (IJKCS) Website
 
-**URL**: https://lovable.dev/projects/7410f81b-8218-4f2d-bb32-1ba1f84eabb2
+## Overview
 
-## How can I edit this code?
+This is the official website for the International Journal of Indigenous Knowledge and Cultural Studies (IJKCS), published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC). The site provides open access to peer-reviewed articles, archives, and information about the journal, its editorial board, and submission guidelines.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Modern UI**: Built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
+- **Authentication**: User authentication and profile management via Supabase.
+- **Admin Panel**: Manage articles, users, and journal settings (protected routes).
+- **Article Management**: Upload, view, search, and filter journal articles.
+- **Open Access**: All articles are freely available for download.
+- **Responsive Design**: Works well on desktop and mobile devices.
+- **Contact & About Pages**: Information about the journal, editorial board, and contact form.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7410f81b-8218-4f2d-bb32-1ba1f84eabb2) and start prompting.
+## Technologies
 
-Changes made via Lovable will be committed automatically to this repo.
+- React + Vite + TypeScript
+- Tailwind CSS & shadcn/ui
+- Supabase (database, authentication, storage, edge functions)
+- React Query, React Router
+- ESLint, Prettier
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Clone the repository**
+	```
+	git clone <REPO_URL>
+	cd ijkcs-journal-website
+	```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Install dependencies**
+	```
+	npm install
+	```
 
-Follow these steps:
+3. **Set up environment variables**
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+	Create a `.env` file with your Supabase project credentials:
+	```
+	VITE_SUPABASE_URL=...
+	VITE_SUPABASE_PUBLISHABLE_KEY=...
+	```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. **Run the development server**
+	```
+	npm run dev
+	```
 
-# Step 3: Install the necessary dependencies.
-npm i
+5. **Build for production**
+	```
+	npm run build
+	```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Project Structure
 
-**Edit a file directly in GitHub**
+- `src/pages/` — Main pages (Home, Archives, About, Contact, Admin, etc.)
+- `src/components/` — UI components (including admin and profile subfolders)
+- `src/hooks/` — Custom React hooks (authentication, data fetching)
+- `src/integrations/supabase/` — Supabase client and types
+- `supabase/functions/` — Supabase Edge Functions for backend logic
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Deployment
 
-**Use GitHub Codespaces**
+- Deploy via Vercel, Netlify, or your preferred provider.
+- For Lovable users: Use the Lovable dashboard to publish and manage deployments.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## License
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/7410f81b-8218-4f2d-bb32-1ba1f84eabb2) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Articles are published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). See About page for details.
