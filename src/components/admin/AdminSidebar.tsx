@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Upload, Users, Settings, LogOut, BookOpen, User } from "lucide-react";
+import { LayoutDashboard, FileText, Upload, Users, Settings, LogOut, BookOpen, User, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -85,6 +85,13 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
             <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
           </div>
         </div>
+        <button
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-accent/20 hover:text-accent transition-colors"
+          onClick={() => navigate("/")}
+        >
+          <Home className="h-4 w-4" />
+          Back to Site
+        </button>
         <button
           className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
           onClick={handleSignOut}
