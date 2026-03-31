@@ -31,8 +31,10 @@ const Admin = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Sidebar: responsive, hidden on mobile, shown on md+ */}
       <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 p-8 overflow-y-auto">
+      {/* Main content: responsive padding */}
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
         {renderContent()}
       </main>
     </div>
