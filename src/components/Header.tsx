@@ -81,18 +81,26 @@ const Header = () => {
               ))}
             </nav>
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-muted/60 transition-all duration-300 hover:scale-110"
-              aria-label="Toggle theme"
-            >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
+            <div className="flex items-center gap-2">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-muted/60 transition-all duration-300 hover:scale-110"
+                aria-label="Toggle theme"
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+
+              {!user && (
+                <Link
+                  to="/login"
+                  className="flex items-center gap-1.5 text-sm font-medium rounded-full px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Link>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>

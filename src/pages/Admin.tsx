@@ -1,13 +1,20 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminOverview from "@/components/admin/AdminOverview";
 import AdminArticles from "@/components/admin/AdminArticles";
 import AdminUpload from "@/components/admin/AdminUpload";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminSettings from "@/components/admin/AdminSettings";
+import PageLoader from "@/components/PageLoader";
 
 const Admin = () => {
+  const { user, loading, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+
+  if (loading) return <PageLoader />;
+  if (!user || !isAdmin) return <Navigate to="/login" replace />;
 
   const renderContent = () => {
     switch (activeTab) {
