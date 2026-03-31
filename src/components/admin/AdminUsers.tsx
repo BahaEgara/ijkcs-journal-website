@@ -39,49 +39,51 @@ const AdminUsers = () => {
   // Role counts removed
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-0">
       <div>
-        <h1 className="text-3xl font-serif font-bold text-foreground">Users</h1>
-        <p className="text-muted-foreground mt-1">Manage user accounts.</p>
+        <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">Users</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage user accounts.</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-lg">All Users</CardTitle>
+          <CardTitle className="font-serif text-base sm:text-lg">All Users</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center p-8 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading users...
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Joined</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(users ?? []).map((user) => (
-                  <TableRow key={user.id} className="hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium">{user.full_name || "—"}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{user.email || "—"}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {(!users || users.length === 0) && (
+            <div className="min-w-[400px]">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                      No users found.
-                    </TableCell>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Joined</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {(users ?? []).map((user) => (
+                    <TableRow key={user.id} className="hover:bg-muted/40 transition-colors">
+                      <TableCell className="font-medium text-xs sm:text-sm">{user.full_name || "—"}</TableCell>
+                      <TableCell className="text-xs sm:text-sm text-muted-foreground">{user.email || "—"}</TableCell>
+                      <TableCell className="text-xs sm:text-sm text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {(!users || users.length === 0) && (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                        No users found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

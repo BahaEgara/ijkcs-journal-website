@@ -50,10 +50,10 @@ const AdminOverview = () => {
   const isLoading = statsLoading || articlesLoading;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 px-2 sm:px-0">
       <div>
-        <h1 className="text-3xl font-serif font-bold text-foreground">Dashboard Overview</h1>
-        <p className="text-muted-foreground mt-1">Welcome back. Here's what's happening with IJIKCS.</p>
+        <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">Dashboard Overview</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">Welcome back. Here's what's happening with IJIKCS.</p>
       </div>
 
       {isLoading && (
@@ -62,18 +62,18 @@ const AdminOverview = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <Card key={stat.label} className="hover:shadow-md transition-shadow duration-200 group">
-            <CardContent className="pt-6">
+            <CardContent className="pt-5 sm:pt-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stat.value}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{stat.value}</p>
                   {stat.trend && <p className="text-xs text-accent mt-2">{stat.trend}</p>}
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                  <stat.icon className="h-6 w-6 text-accent" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
                 </div>
               </div>
             </CardContent>
@@ -83,15 +83,15 @@ const AdminOverview = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-lg">Recently Updated Articles</CardTitle>
+          <CardTitle className="font-serif text-base sm:text-lg">Recently Updated Articles</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {(recentArticles ?? []).map((article) => (
-              <div key={article.id} className="flex items-start gap-4 py-3 border-b border-border last:border-0">
-                <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0" />
+              <div key={article.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 py-3 border-b border-border last:border-0">
+                <div className="w-2 h-2 rounded-full bg-accent mt-1 sm:mt-2 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{article.title}</p>
+                  <p className="text-xs sm:text-sm font-medium text-foreground">{article.title}</p>
                 </div>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
                   {new Date(article.updated_at).toLocaleDateString()}
@@ -99,7 +99,7 @@ const AdminOverview = () => {
               </div>
             ))}
             {!articlesLoading && (!recentArticles || recentArticles.length === 0) && (
-              <p className="text-sm text-muted-foreground">No articles yet.</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">No articles yet.</p>
             )}
           </div>
         </CardContent>

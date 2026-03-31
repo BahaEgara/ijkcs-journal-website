@@ -67,16 +67,16 @@ const AdminArticles = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-0">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Manage Articles</h1>
-          <p className="text-muted-foreground mt-1">{articles.length} articles in the database</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">Manage Articles</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">{articles.length} articles in the database</p>
         </div>
       </div>
 
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -84,11 +84,11 @@ const AdminArticles = () => {
                 placeholder="Search by title or author..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-xs sm:text-sm"
               />
             </div>
             <Select value={filterVolume} onValueChange={setFilterVolume}>
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px] text-xs sm:text-sm">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filter by volume" />
               </SelectTrigger>
@@ -104,17 +104,17 @@ const AdminArticles = () => {
       </Card>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center p-8 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading articles...
             </div>
           ) : ( 
-            <div className="overflow-x-auto">
+            <div className="min-w-[600px]">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[300px]">Title</TableHead>
+                    <TableHead className="min-w-[200px] sm:min-w-[300px]">Title</TableHead>
                     <TableHead>Authors</TableHead>
                     <TableHead>Volume</TableHead>
                     <TableHead>Topic</TableHead>
@@ -125,11 +125,11 @@ const AdminArticles = () => {
                 <TableBody>
                   {filtered.map((article: any) => (
                     <TableRow key={article.id} className="group hover:bg-muted/40 transition-colors">
-                      <TableCell className="font-medium">{article.title}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="font-medium text-xs sm:text-sm">{article.title}</TableCell>
+                      <TableCell className="text-xs sm:text-sm text-muted-foreground">
                         {Array.isArray(article.authors) ? article.authors.join(", ") : ""}
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs sm:text-sm">
                         Vol. {article.volume}{article.issue ? `, Issue ${article.issue}` : ""} ({article.year})
                       </TableCell>
                       <TableCell>
