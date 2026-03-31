@@ -33,44 +33,46 @@ const AdminUpload = () => {
         throw new Error("Please fill in all required fields.");
       }
 
-      let pdfUrl: string | null = null;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
 
-      if (pdfFile) {
-        const fileName = `${Date.now()}-${pdfFile.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from("journal-pdfs")
-          .upload(fileName, pdfFile, { contentType: "application/pdf" });
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("authors", authors);
+      formData.append("abstract", abstract);
+      formData.append("keywords", keywords);
+      formData.append("volume", volume);
+      if (issue) formData.append("issue", issue);
+      formData.append("year", year);
+      formData.append("pages", pages);
+      if (doi) formData.append("doi", doi);
+      if (topic) formData.append("topic", topic);
+      formData.append("published_date", publishedDate);
+      if (pdfFile) formData.append("pdf", pdfFile);
 
-        if (uploadError) throw new Error(`PDF upload failed: ${uploadError.message}`);
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/upload-article`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
 
-        const { data: urlData } = supabase.storage
-          .from("journal-pdfs")
-          .getPublicUrl(fileName);
-        pdfUrl = urlData.publicUrl;
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Upload failed");
       }
-
-      const { error } = await supabase.from("journal_articles").insert({
-        title,
-        authors: authors.split(",").map((a) => a.trim()),
-        abstract: abstract,
-        keywords: keywords.split(",").map((k) => k.trim()),
-        volume: parseInt(volume),
-        issue: issue ? parseInt(issue) : null,
-        year: parseInt(year),
-        pages,
-        doi: doi || null,
-        topic: topic || null,
-        published_date: publishedDate,
-        pdf_url: pdfUrl,
-      });
-
-      if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
       toast({ title: "Article published successfully!" });
-      // Reset form
       setTitle(""); setAuthors(""); setAbstract(""); setKeywords("");
       setVolume(""); setIssue(""); setYear(""); setPages("");
       setDoi(""); setTopic(""); setPublishedDate(""); setPdfFile(null);

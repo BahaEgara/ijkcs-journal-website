@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Pencil, Trash2, FileText, Download, Filter, Loader2 } from "lucide-react";
+import { Search, Trash2, FileText, Download, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,38 +16,38 @@ const AdminArticles = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: articles, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["admin-articles"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_articles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase.functions.invoke("manage-articles", {
+        method: "GET",
+      });
+
       if (error) throw error;
-      return data;
+      return data as { articles: any[]; volumes: number[] };
     },
   });
 
-  const { data: volumes } = useQuery({
-    queryKey: ["admin-volumes"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_articles")
-        .select("volume");
-      if (error) throw error;
-      const unique = [...new Set((data ?? []).map((d) => d.volume))].sort((a, b) => b - a);
-      return unique;
-    },
-  });
+  const articles = data?.articles ?? [];
+  const volumes = data?.volumes ?? [];
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("journal_articles").delete().eq("id", id);
+      const { data, error } = await supabase.functions.invoke("manage-articles", {
+        method: "DELETE",
+        body: { id },
+      });
+
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
       toast({ title: "Article deleted" });
     },
     onError: (error: Error) => {
@@ -55,7 +55,7 @@ const AdminArticles = () => {
     },
   });
 
-  const filtered = (articles ?? []).filter((a) => {
+  const filtered = articles.filter((a: any) => {
     const matchesSearch =
       a.title.toLowerCase().includes(search.toLowerCase()) ||
       a.authors.some((auth: string) => auth.toLowerCase().includes(search.toLowerCase()));
@@ -68,7 +68,7 @@ const AdminArticles = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-serif font-bold text-foreground">Manage Articles</h1>
-          <p className="text-muted-foreground mt-1">{articles?.length ?? 0} articles in the database</p>
+          <p className="text-muted-foreground mt-1">{articles.length} articles in the database</p>
         </div>
       </div>
 
@@ -91,7 +91,7 @@ const AdminArticles = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Volumes</SelectItem>
-                {(volumes ?? []).map((v) => (
+                {volumes.map((v: number) => (
                   <SelectItem key={v} value={v.toString()}>Volume {v}</SelectItem>
                 ))}
               </SelectContent>
@@ -120,7 +120,7 @@ const AdminArticles = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((article) => (
+                  {filtered.map((article: any) => (
                     <TableRow key={article.id} className="group hover:bg-muted/40 transition-colors">
                       <TableCell className="font-medium">{article.title}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
