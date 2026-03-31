@@ -1,7 +1,7 @@
-
-import { LayoutDashboard, FileText, Upload, Users, Settings, LogOut, BookOpen } from "lucide-react";
+import { LayoutDashboard, FileText, Upload, Users, Settings, LogOut, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -9,23 +9,31 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "articles", label: "Articles", icon: FileText },
-  { id: "upload", label: "Upload Article", icon: Upload },
-  { id: "users", label: "Users & Roles", icon: Users },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "overview", label: "Overview",        icon: LayoutDashboard },
+  { id: "articles", label: "Articles",         icon: FileText },
+  { id: "upload",   label: "Upload Article",   icon: Upload },
+  { id: "users",    label: "Users & Roles",    icon: Users },
+  { id: "settings", label: "Settings",         icon: Settings },
+  { id: "profile",  label: "Profile",          icon: User },
 ];
-
-import { useNavigate } from "react-router-dom";
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const displayName = user?.user_metadata?.full_name || user?.email || "User";
+
+  const displayName =
+    user?.user_metadata?.full_name || user?.email || "User";
   const displayEmail = user?.email || "";
-  const initials = (user?.user_metadata?.full_name
-    ? user.user_metadata.full_name.split(" ").map((n: string) => n[0]).join("")
-    : (user?.email ? user.email[0] : "U")).toUpperCase();
+  const initials = (
+    user?.user_metadata?.full_name
+      ? user.user_metadata.full_name
+          .split(" ")
+          .map((n: string) => n[0])
+          .join("")
+      : user?.email
+      ? user.email[0]
+      : "U"
+  ).toUpperCase();
 
   const handleSignOut = async () => {
     await signOut();

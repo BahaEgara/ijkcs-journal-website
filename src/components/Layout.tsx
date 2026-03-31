@@ -17,7 +17,6 @@ const Layout = ({ children }: LayoutProps) => {
       setIsLoading(false);
     }, 400);
 
-    // Scroll to top on page change
     window.scrollTo(0, 0);
 
     return () => clearTimeout(timer);
@@ -25,8 +24,8 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <>
-      {isLoading && <PageLoader />}
       {children}
+      {isLoading && <PageLoader />}
       <ScrollToTop />
     </>
   );
