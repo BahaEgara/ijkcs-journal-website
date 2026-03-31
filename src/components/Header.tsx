@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
