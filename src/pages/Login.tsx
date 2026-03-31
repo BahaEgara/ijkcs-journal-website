@@ -19,7 +19,9 @@ const Login = () => {
     const handlePasswordReset = async (e: React.FormEvent) => {
       e.preventDefault();
       setResetLoading(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: "https://www.ijkcs.org/reset-password"
+      });
       if (error) {
         toast({ title: "Reset failed", description: error.message, variant: "destructive" });
       } else {
