@@ -112,11 +112,12 @@ const AdminArticles = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { data, error } = await supabase.functions.invoke("manage-articles", {
-        method: "POST",
-        body: { _method: "DELETE", id },
+        method: "DELETE",                    // Changed to native DELETE
+        body: { id },                        // Send id in body
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
@@ -127,7 +128,11 @@ const AdminArticles = () => {
     },
     onError: (error: Error) => {
       setArticleToDelete(null);
-      toast({ title: "Error deleting article", description: error.message, variant: "destructive" });
+      toast({ 
+        title: "Error deleting article", 
+        description: error.message, 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -150,7 +155,11 @@ const AdminArticles = () => {
       toast({ title: "Article updated successfully" });
     },
     onError: (error: Error) => {
-      toast({ title: "Error updating article", description: error.message, variant: "destructive" });
+      toast({ 
+        title: "Error updating article", 
+        description: error.message, 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -239,7 +248,10 @@ const AdminArticles = () => {
       <Dialog
         open={!!articleToEdit}
         onOpenChange={(open) => {
-          if (!open) { setArticleToEdit(null); setEditForm(null); }
+          if (!open) { 
+            setArticleToEdit(null); 
+            setEditForm(null); 
+          }
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
