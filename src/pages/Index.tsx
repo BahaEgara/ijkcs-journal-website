@@ -48,10 +48,10 @@ const Index = () => {
             {/* Content */}
             <div className="order-1 lg:order-2">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight mb-6">
-                International Journal of Indigenous Knowledge and Cultural Studies
+                ASILI JOURNAL
               </h1>
               <p className="text-lg text-muted-foreground mb-4">
-                <span className="font-semibold text-foreground">IJKCS</span> is a peer-reviewed scholarly journal published by the{" "}
+                <span className="font-semibold text-foreground">ASILI JOURNAL</span> is a peer-reviewed scholarly journal published by the{" "}
                 <span className="font-semibold">African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC)</span>.
               </p>
               <p className="text-muted-foreground leading-relaxed">
@@ -87,7 +87,7 @@ const Index = () => {
               <div>
                 <h2 className="text-lg font-semibold mb-2">Announcement</h2>
                 <p className="text-foreground">
-                  The First Issue of IJKCS will be officially launched on <strong>27th February 2026</strong>.
+                  The First Issue of Asili Journal will be officially launched on <strong>27th March 2026</strong>.
                 </p>
               </div>
             </div>
@@ -170,9 +170,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4">About IJKCS</h3>
+              <h3 className="font-semibold mb-4">About Asili Journal</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                International Journal of Indigenous Knowledge and Cultural Studies (IJKCS) is published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC).
+                International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal) is published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC).
               </p>
             </div>
             <div>
@@ -197,7 +197,7 @@ const Index = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            <p>© 2025 International Journal of Indigenous Knowledge and Cultural Studies (IJKCS). All rights reserved.</p>
+            <p>© 2025 International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal). All rights reserved.</p>
           </div>
         </div>
       </footer>

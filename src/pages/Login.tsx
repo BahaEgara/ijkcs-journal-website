@@ -20,7 +20,7 @@ const Login = () => {
       e.preventDefault();
       setResetLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: "https://www.ijkcs.org/reset-password"
+        redirectTo: "https://www.asili-journal.org/reset-password"
       });
       if (error) {
         toast({ title: "Reset failed", description: error.message, variant: "destructive" });

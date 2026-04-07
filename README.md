@@ -1,9 +1,9 @@
 
-# International Journal of Indigenous Knowledge and Cultural Studies (IJKCS) Website
+# International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal) Website
 
 ## Overview
 
-This is the official website for the International Journal of Indigenous Knowledge and Cultural Studies (IJKCS), published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC). The site provides open access to peer-reviewed articles, archives, and information about the journal, its editorial board, and submission guidelines.
+This is the official website for the International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal), published by the African Centre for Advancement of Indigenous Knowledge and Culture (ACAIKC). The site provides open access to peer-reviewed articles, archives, and information about the journal, its editorial board, and submission guidelines.
 
 ## Features
 

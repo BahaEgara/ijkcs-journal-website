@@ -53,7 +53,7 @@ const AdminOverview = () => {
     <div className="space-y-6 sm:space-y-8 px-2 sm:px-0">
       <div>
         <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">Dashboard Overview</h1>
-        <p className="text-sm sm:text-base text-muted-foreground mt-1">Welcome back. Here's what's happening with IJIKCS.</p>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">Welcome back. Here's what's happening with Asili Journal.</p>
       </div>
 
       {isLoading && (

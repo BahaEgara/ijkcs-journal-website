@@ -69,7 +69,7 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
                   <BookOpen className="h-5 w-5 text-accent-foreground" />
                 </div>
                 <div>
-                  <p className="font-serif font-bold text-sm text-foreground">IJIKCS</p>
+                  <p className="font-serif font-bold text-sm text-foreground">Asili Journal</p>
                   <p className="text-xs text-muted-foreground">Admin Panel</p>
                 </div>
               </div>
@@ -131,7 +131,7 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
               <BookOpen className="h-5 w-5 text-accent-foreground" />
             </div>
             <div>
-              <p className="font-serif font-bold text-sm text-foreground">IJIKCS</p>
+              <p className="font-serif font-bold text-sm text-foreground">Asili Journal</p>
               <p className="text-xs text-muted-foreground">Admin Panel</p>
             </div>
           </div>

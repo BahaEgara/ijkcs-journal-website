@@ -266,7 +266,7 @@ const Archives = () => {
           <div className="text-center text-sm text-muted-foreground">
             <p>
               © 2025 International Journal of Indigenous Knowledge and Cultural
-              Studies (IJKCS). All rights reserved.
+              Studies (Asili Journal). All rights reserved.
             </p>
           </div>
         </div>

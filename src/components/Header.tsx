@@ -58,10 +58,10 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                <span className="text-primary-foreground font-bold text-lg">IJ</span>
+                <span className="text-primary-foreground font-bold text-lg">AJ</span>
               </div>
               <div>
-                <span className="text-base font-bold font-serif block leading-tight">IJKCS</span>
+                <span className="text-base font-bold font-serif block leading-tight">ASILI</span>
               </div>
             </Link>
 
@@ -119,7 +119,7 @@ const Header = () => {
             <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-base">IJ</span>
             </div>
-            <span className="text-base font-bold font-serif">IJKCS</span>
+            <span className="text-base font-bold font-serif">ASILI</span>
           </Link>
 
           {/* Actions */}

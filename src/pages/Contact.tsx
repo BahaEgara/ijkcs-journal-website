@@ -54,7 +54,7 @@ const Contact = () => {
                   <div>
                     <h3 className="font-medium mb-1">Postal Address</h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      International Journal of Indigenous Knowledge and Cultural Studies (IJKCS)<br />
+                      International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal)<br />
                       African Centre for Advancement of Indigenous Knowledge and Culture<br />
                       P.O. Box 72-00618<br />
                       Nairobi, Kenya
@@ -211,7 +211,7 @@ const Contact = () => {
       <footer className="border-t border-border mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-sm text-muted-foreground">
-            <p>© 2025 International Journal of Indigenous Knowledge and Cultural Studies (IJKCS). All rights reserved.</p>
+            <p>© 2025 International Journal of Indigenous Knowledge and Cultural Studies (Asili Journal). All rights reserved.</p>
           </div>
         </div>
       </footer>

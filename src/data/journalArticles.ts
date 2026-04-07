@@ -28,7 +28,7 @@ export const currentIssue: JournalIssue = {
   publishedDate: "February 2026",
   articles: [
     {
-      id: "ijkcs-2026-001",
+      id: "asili-2026-001",
       title: "Preserving African Indigenous Knowledge Systems: A Framework for Documentation and Transmission",
       authors: ["Akinwumi Ogundiran", "Fatima Bello"],
       abstract: "This paper proposes a comprehensive framework for documenting and transmitting African Indigenous Knowledge Systems (IKS) to future generations. Drawing on case studies from Nigeria and Kenya, we examine traditional methods of knowledge preservation and propose modern adaptations that respect cultural protocols while ensuring accessibility.",
@@ -40,7 +40,7 @@ export const currentIssue: JournalIssue = {
       publishedDate: "February 2026"
     },
     {
-      id: "ijkcs-2026-002",
+      id: "asili-2026-002",
       title: "Traditional Conflict Resolution Mechanisms in East African Communities: Lessons for Contemporary Governance",
       authors: ["Wanjiku Mwangi", "Samuel Ochieng"],
       abstract: "This study examines traditional conflict resolution mechanisms practiced across East African communities, analyzing their effectiveness and relevance to contemporary governance structures. Through ethnographic research in Kenya, Uganda, and Tanzania, we identify key principles that could enhance modern dispute resolution frameworks.",
@@ -52,7 +52,7 @@ export const currentIssue: JournalIssue = {
       publishedDate: "February 2026"
     },
     {
-      id: "ijkcs-2026-003",
+      id: "asili-2026-003",
       title: "Indigenous Agroecological Practices and Climate Resilience in Sub-Saharan Africa",
       authors: ["Chioma Nwosu", "Kofi Asante", "Amara Diallo"],
       abstract: "This research investigates indigenous agroecological practices in Sub-Saharan Africa and their potential contribution to climate resilience. We document traditional farming systems, seed preservation methods, and land management techniques that have sustained communities for generations and assess their applicability in the context of climate change adaptation.",
@@ -64,7 +64,7 @@ export const currentIssue: JournalIssue = {
       publishedDate: "February 2026"
     },
     {
-      id: "ijkcs-2026-004",
+      id: "asili-2026-004",
       title: "Oral Literature as Cultural Repository: A Study of Proverbs and Riddles in Swahili-Speaking Communities",
       authors: ["Bakari Musa"],
       abstract: "This paper explores the role of proverbs and riddles as repositories of cultural knowledge in Swahili-speaking communities. Through analysis of collected oral literature from coastal Kenya and Tanzania, we demonstrate how these linguistic forms encode philosophical concepts, moral teachings, and historical memory.",
@@ -76,7 +76,7 @@ export const currentIssue: JournalIssue = {
       publishedDate: "February 2026"
     },
     {
-      id: "ijkcs-2026-005",
+      id: "asili-2026-005",
       title: "Traditional African Medicine: Integrating Indigenous Healing Knowledge with Modern Healthcare Systems",
       authors: ["Esther Ndung'u", "Peter Mutiso"],
       abstract: "This study examines approaches to integrating traditional African medicine with modern healthcare delivery systems. Through case studies of collaborative models in Kenya and South Africa, we analyze challenges, successes, and policy frameworks that can facilitate respectful integration while protecting indigenous intellectual property.",
@@ -88,7 +88,7 @@ export const currentIssue: JournalIssue = {
       publishedDate: "February 2026"
     },
     {
-      id: "ijkcs-2026-006",
+      id: "asili-2026-006",
       title: "Sacred Spaces and Environmental Conservation: Indigenous Approaches to Biodiversity Protection in Kenya",
       authors: ["Grace Wambui", "John Kamau", "Mary Njeri"],
       abstract: "This research explores the relationship between sacred natural sites and biodiversity conservation in Kenya. We document how traditional beliefs and practices associated with sacred groves, forests, and water sources have contributed to environmental protection and discuss implications for contemporary conservation policy.",
