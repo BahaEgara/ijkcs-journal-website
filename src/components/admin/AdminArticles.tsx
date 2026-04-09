@@ -44,35 +44,49 @@ interface Article {
   id: string;
   title: string;
   authors: string[];
+  orcid?: string | null;
   abstract?: string;
+  keywords?: string[];
   volume?: number;
   issue?: number;
   year?: number;
+  pages?: string;
   topic?: string;
   doi?: string;
   pdf_url?: string;
+  published_date?: string;
 }
 
 interface EditFormState {
   title: string;
-  authors: string;        // comma-separated for the input
+  authors: string;       // comma-separated for the input
+  orcid: string;
   abstract: string;
+  keywords: string;      // comma-separated for the input
   volume: string;
   issue: string;
   year: string;
+  pages: string;
   topic: string;
   doi: string;
+  published_date: string;
 }
 
+const ORCID_REGEX = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+
 const toFormState = (a: Article): EditFormState => ({
-  title:    a.title ?? "",
-  authors:  Array.isArray(a.authors) ? a.authors.join(", ") : "",
-  abstract: a.abstract ?? "",
-  volume:   a.volume?.toString() ?? "",
-  issue:    a.issue?.toString() ?? "",
-  year:     a.year?.toString() ?? "",
-  topic:    a.topic ?? "",
-  doi:      a.doi ?? "",
+  title:          a.title ?? "",
+  authors:        Array.isArray(a.authors) ? a.authors.join(", ") : "",
+  orcid:          a.orcid ?? "",
+  abstract:       a.abstract ?? "",
+  keywords:       Array.isArray(a.keywords) ? a.keywords.join(", ") : "",
+  volume:         a.volume?.toString() ?? "",
+  issue:          a.issue?.toString() ?? "",
+  year:           a.year?.toString() ?? "",
+  pages:          a.pages ?? "",
+  topic:          a.topic ?? "",
+  doi:            a.doi ?? "",
+  published_date: a.published_date ?? "",
 });
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -86,6 +100,7 @@ const AdminArticles = () => {
   // Edit dialog state
   const [articleToEdit, setArticleToEdit] = useState<Article | null>(null);
   const [editForm, setEditForm] = useState<EditFormState | null>(null);
+  const [orcidError, setOrcidError] = useState("");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -112,8 +127,8 @@ const AdminArticles = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { data, error } = await supabase.functions.invoke("manage-articles", {
-        method: "DELETE",                    // Changed to native DELETE
-        body: { id },                        // Send id in body
+        method: "DELETE",
+        body: { id },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -128,17 +143,17 @@ const AdminArticles = () => {
     },
     onError: (error: Error) => {
       setArticleToDelete(null);
-      toast({ 
-        title: "Error deleting article", 
-        description: error.message, 
-        variant: "destructive" 
+      toast({
+        title: "Error deleting article",
+        description: error.message,
+        variant: "destructive",
       });
     },
   });
 
   // ── Edit mutation ──────────────────────────────────────────────────────────
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Article> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, any> }) => {
       const { data, error } = await supabase.functions.invoke("manage-articles", {
         method: "POST",
         body: { _method: "PATCH", id, updates },
@@ -152,13 +167,14 @@ const AdminArticles = () => {
       queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
       setArticleToEdit(null);
       setEditForm(null);
+      setOrcidError("");
       toast({ title: "Article updated successfully" });
     },
     onError: (error: Error) => {
-      toast({ 
-        title: "Error updating article", 
-        description: error.message, 
-        variant: "destructive" 
+      toast({
+        title: "Error updating article",
+        description: error.message,
+        variant: "destructive",
       });
     },
   });
@@ -167,24 +183,37 @@ const AdminArticles = () => {
   const openEdit = (article: Article) => {
     setArticleToEdit(article);
     setEditForm(toFormState(article));
+    setOrcidError("");
   };
 
   const handleEditField = (field: keyof EditFormState, value: string) => {
     setEditForm((prev) => prev ? { ...prev, [field]: value } : prev);
+    if (field === "orcid") setOrcidError("");
   };
 
   const handleEditSave = () => {
     if (!articleToEdit || !editForm) return;
 
-    const updates: Partial<Article> = {
-      title:   editForm.title.trim(),
-      authors: editForm.authors.split(",").map((s) => s.trim()).filter(Boolean),
-      abstract: editForm.abstract.trim(),
-      volume:  editForm.volume  ? Number(editForm.volume)  : undefined,
-      issue:   editForm.issue   ? Number(editForm.issue)   : undefined,
-      year:    editForm.year    ? Number(editForm.year)    : undefined,
-      topic:   editForm.topic.trim()   || undefined,
-      doi:     editForm.doi.trim()     || undefined,
+    // Validate ORCID if provided
+    const orcidValue = editForm.orcid.trim();
+    if (orcidValue !== "" && !ORCID_REGEX.test(orcidValue)) {
+      setOrcidError("Invalid format. Expected: 0000-0000-0000-0000");
+      return;
+    }
+
+    const updates: Record<string, any> = {
+      title:          editForm.title.trim(),
+      authors:        editForm.authors.split(",").map((s) => s.trim()).filter(Boolean),
+      orcid:          orcidValue || null,
+      abstract:       editForm.abstract.trim(),
+      keywords:       editForm.keywords.split(",").map((s) => s.trim()).filter(Boolean),
+      volume:         editForm.volume         ? Number(editForm.volume)  : undefined,
+      issue:          editForm.issue          ? Number(editForm.issue)   : undefined,
+      year:           editForm.year           ? Number(editForm.year)    : undefined,
+      pages:          editForm.pages.trim()   || undefined,
+      topic:          editForm.topic.trim()   || undefined,
+      doi:            editForm.doi.trim()     || undefined,
+      published_date: editForm.published_date || undefined,
     };
 
     editMutation.mutate({ id: articleToEdit.id, updates });
@@ -248,9 +277,10 @@ const AdminArticles = () => {
       <Dialog
         open={!!articleToEdit}
         onOpenChange={(open) => {
-          if (!open) { 
-            setArticleToEdit(null); 
-            setEditForm(null); 
+          if (!open) {
+            setArticleToEdit(null);
+            setEditForm(null);
+            setOrcidError("");
           }
         }}
       >
@@ -264,9 +294,12 @@ const AdminArticles = () => {
 
           {editForm && (
             <div className="grid gap-4 py-2">
+
               {/* Title */}
               <div className="space-y-1.5">
-                <Label htmlFor="edit-title">Title <span className="text-destructive">*</span></Label>
+                <Label htmlFor="edit-title">
+                  Title <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="edit-title"
                   value={editForm.title}
@@ -275,18 +308,38 @@ const AdminArticles = () => {
                 />
               </div>
 
-              {/* Authors */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-authors">
-                  Authors{" "}
-                  <span className="text-xs text-muted-foreground font-normal">(comma-separated)</span>
-                </Label>
-                <Input
-                  id="edit-authors"
-                  value={editForm.authors}
-                  onChange={(e) => handleEditField("authors", e.target.value)}
-                  placeholder="Jane Doe, John Smith"
-                />
+              {/* Authors + ORCID side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-authors">
+                    Authors{" "}
+                    <span className="text-xs text-muted-foreground font-normal">(comma-separated)</span>
+                  </Label>
+                  <Input
+                    id="edit-authors"
+                    value={editForm.authors}
+                    onChange={(e) => handleEditField("authors", e.target.value)}
+                    placeholder="Jane Doe, John Smith"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-orcid">
+                    ORCID iD{" "}
+                    <span className="text-xs text-muted-foreground font-normal">(corresponding author)</span>
+                  </Label>
+                  <Input
+                    id="edit-orcid"
+                    value={editForm.orcid}
+                    onChange={(e) => handleEditField("orcid", e.target.value)}
+                    placeholder="0000-0000-0000-0000"
+                    className={orcidError ? "border-destructive focus-visible:ring-destructive" : ""}
+                  />
+                  {orcidError ? (
+                    <p className="text-xs text-destructive">{orcidError}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Leave blank to clear</p>
+                  )}
+                </div>
               </div>
 
               {/* Abstract */}
@@ -302,8 +355,22 @@ const AdminArticles = () => {
                 />
               </div>
 
-              {/* Volume / Issue / Year */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Keywords */}
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-keywords">
+                  Keywords{" "}
+                  <span className="text-xs text-muted-foreground font-normal">(comma-separated)</span>
+                </Label>
+                <Input
+                  id="edit-keywords"
+                  value={editForm.keywords}
+                  onChange={(e) => handleEditField("keywords", e.target.value)}
+                  placeholder="indigenous knowledge, oral traditions"
+                />
+              </div>
+
+              {/* Volume / Issue / Year / Pages */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="edit-volume">Volume</Label>
                   <Input
@@ -338,29 +405,64 @@ const AdminArticles = () => {
                     max={2100}
                   />
                 </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-pages">Pages</Label>
+                  <Input
+                    id="edit-pages"
+                    value={editForm.pages}
+                    onChange={(e) => handleEditField("pages", e.target.value)}
+                    placeholder="1-15"
+                  />
+                </div>
               </div>
 
-              {/* Topic */}
+              {/* Topic + DOI */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-topic">Topic / Region</Label>
+                  <Select
+                    value={editForm.topic || "none"}
+                    onValueChange={(v) => handleEditField("topic", v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger id="edit-topic">
+                      <SelectValue placeholder="Select topic" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— None —</SelectItem>
+                      <SelectItem value="East Africa">East Africa</SelectItem>
+                      <SelectItem value="West Africa">West Africa</SelectItem>
+                      <SelectItem value="Southern Africa">Southern Africa</SelectItem>
+                      <SelectItem value="Heritage Preservation">Heritage Preservation</SelectItem>
+                      <SelectItem value="Governance & Law">Governance & Law</SelectItem>
+                      <SelectItem value="Health & Healing">Health & Healing</SelectItem>
+                      <SelectItem value="Language & Literature">Language & Literature</SelectItem>
+                      <SelectItem value="Environmental Stewardship">Environmental Stewardship</SelectItem>
+                      <SelectItem value="Indigenous Technology">Indigenous Technology</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-doi">DOI</Label>
+                  <Input
+                    id="edit-doi"
+                    value={editForm.doi}
+                    onChange={(e) => handleEditField("doi", e.target.value)}
+                    placeholder="10.xxxx/xxxxx"
+                  />
+                </div>
+              </div>
+
+              {/* Published Date */}
               <div className="space-y-1.5">
-                <Label htmlFor="edit-topic">Topic</Label>
+                <Label htmlFor="edit-published-date">Published Date</Label>
                 <Input
-                  id="edit-topic"
-                  value={editForm.topic}
-                  onChange={(e) => handleEditField("topic", e.target.value)}
-                  placeholder="e.g. Machine Learning"
+                  id="edit-published-date"
+                  type="date"
+                  value={editForm.published_date}
+                  onChange={(e) => handleEditField("published_date", e.target.value)}
                 />
               </div>
 
-              {/* DOI */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-doi">DOI</Label>
-                <Input
-                  id="edit-doi"
-                  value={editForm.doi}
-                  onChange={(e) => handleEditField("doi", e.target.value)}
-                  placeholder="10.xxxx/xxxxx"
-                />
-              </div>
             </div>
           )}
 
@@ -455,7 +557,14 @@ const AdminArticles = () => {
                         {article.title}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm text-muted-foreground">
-                        {Array.isArray(article.authors) ? article.authors.join(", ") : ""}
+                        <div>
+                          {Array.isArray(article.authors) ? article.authors.join(", ") : ""}
+                        </div>
+                        {article.orcid && (
+                          <div className="text-xs text-muted-foreground/70 mt-0.5 font-mono">
+                            ORCID: {article.orcid}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm">
                         Vol. {article.volume}
@@ -482,7 +591,6 @@ const AdminArticles = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {/* Download PDF */}
                           {article.pdf_url && (
                             <Button
                               size="sm"
@@ -494,7 +602,6 @@ const AdminArticles = () => {
                               <Download className="h-4 w-4" />
                             </Button>
                           )}
-                          {/* Edit */}
                           <Button
                             size="sm"
                             variant="ghost"
@@ -504,7 +611,6 @@ const AdminArticles = () => {
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          {/* Delete */}
                           <Button
                             size="sm"
                             variant="ghost"
