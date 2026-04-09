@@ -15,6 +15,7 @@ const AdminUpload = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [authors, setAuthors] = useState("");
+  const [orcid, setOrcid] = useState("");
   const [abstract, setAbstract] = useState("");
   const [keywords, setKeywords] = useState("");
   const [volume, setVolume] = useState("");
@@ -39,6 +40,7 @@ const AdminUpload = () => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("authors", authors);
+      if (orcid) formData.append("orcid", orcid);
       formData.append("abstract", abstract);
       formData.append("keywords", keywords);
       formData.append("volume", volume);
@@ -73,7 +75,7 @@ const AdminUpload = () => {
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
       toast({ title: "Article published successfully!" });
-      setTitle(""); setAuthors(""); setAbstract(""); setKeywords("");
+      setTitle(""); setAuthors(""); setOrcid(""); setAbstract(""); setKeywords("");
       setVolume(""); setIssue(""); setYear(""); setPages("");
       setDoi(""); setTopic(""); setPublishedDate(""); setPdfFile(null);
     },
@@ -102,10 +104,23 @@ const AdminUpload = () => {
                 <Input placeholder="Enter full article title" value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
 
-              <div className="space-y-2">
-                <Label>Authors <span className="text-destructive">*</span></Label>
-                <Input placeholder="Dr. Amina Osei, Prof. Kwame Mensah" value={authors} onChange={(e) => setAuthors(e.target.value)} />
-                <p className="text-xs text-muted-foreground">Separate multiple authors with commas</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Authors <span className="text-destructive">*</span></Label>
+                  <Input placeholder="Dr. Amina Osei, Prof. Kwame Mensah" value={authors} onChange={(e) => setAuthors(e.target.value)} />
+                  <p className="text-xs text-muted-foreground">Separate multiple authors with commas</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>ORCID iD</Label>
+                  <Input
+                    placeholder="0000-0000-0000-0000"
+                    value={orcid}
+                    onChange={(e) => setOrcid(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Format: 0000-0000-0000-0000 (primary / corresponding author)
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-2">
