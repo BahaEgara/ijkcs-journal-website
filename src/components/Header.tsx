@@ -90,7 +90,7 @@ const Header = () => {
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
 
-              {user ? (
+              {/* {user ? (
                 <Link
                   to="/admin"
                   className="flex items-center gap-1.5 text-sm font-medium rounded-full px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
@@ -105,7 +105,7 @@ const Header = () => {
                   <LogIn className="h-4 w-4" />
                   Login
                 </Link>
-              )}
+              )} */}
             </div>
           </div>
         </div>
