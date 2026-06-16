@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.example.com/</loc>
+    <loc>https://www.asilijournal.org/</loc>
     <changefreq>Home</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.example.com/archives</loc>
+    <loc>https://www.asilijournal.org/archives</loc>
     <changefreq>Archives</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.example.com/about</loc>
+    <loc>https://www.asilijournal.org/about</loc>
     <changefreq>About</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.example.com/contact</loc>
+    <loc>https://www.asilijournal.org/contact</loc>
     <changefreq>Contact</changefreq>
     <priority>0.7</priority>
   </url>
