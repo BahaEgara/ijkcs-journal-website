@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Moon, Sun, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "react-router-dom";
+import logoImage from "@/assets/asililogo.png";
 
 const Header = () => {
   const { user, isAdmin } = useAuth();
@@ -57,8 +58,12 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                <span className="text-primary-foreground font-bold text-lg">AJ</span>
+              <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:scale-110 bg-primary/10">
+                <img
+                  src={logoImage}
+                  alt="Asili Journal logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <span className="text-base font-bold font-serif block leading-tight">ASILI</span>
@@ -116,8 +121,12 @@ const Header = () => {
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-base">IJ</span>
+            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-primary/10">
+              <img
+                src={logoImage}
+                alt="Asili Journal logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-base font-bold font-serif">ASILI</span>
           </Link>
