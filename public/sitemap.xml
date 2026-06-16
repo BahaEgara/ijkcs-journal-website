@@ -12,7 +12,7 @@
   </url>
   <url>
     <loc>https://www.example.com/about</loc>
-    <changefreq>About the Journal</changefreq>
+    <changefreq>About</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
